@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Reaksi Zat Rahasia</title>
+<style>
+body{
+  margin:0;
+  background:radial-gradient(circle,#0b0c10,#000);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Segoe UI,sans-serif;
+  color:#eee;
+}
+
+.panel{
+  width:900px;
+  background:rgba(12,12,18,0.96);
+  padding:30px;
+  border-radius:22px;
+  box-shadow:0 0 50px rgba(0,0,0,0.9);
+}
+
+h2{text-align:center;letter-spacing:4px;}
+
+.area{
+  display:flex;
+  flex-wrap:wrap;
+  gap:22px;
+  justify-content:center;
+  margin-top:25px;
+}
+
+.gelas{
+  width:85px;
+  height:130px;
+  border:3px solid #888;
+  border-radius:0 0 16px 16px;
+  display:flex;
+  align-items:flex-end;
+  cursor:grab;
+}
+
+.isi{
+  width:100%;
+  height:70%;
+  border-radius:0 0 12px 12px;
+}
+
+.label{
+  text-align:center;
+  font-size:11px;
+  margin-top:6px;
+  opacity:0.85;
+}
+
+#hasil{
+  width:120px;
+  height:180px;
+  border:4px dashed #777;
+  border-radius:0 0 20px 20px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+
+#isiHasil{
+  width:100%;
+  height:0%;
+  border-radius:0 0 16px 16px;
+  transition:0.5s;
+}
+
+.salah{
+  box-shadow:0 0 25px red;
+}
+</style>
+</head>
+<body>
+
+<div class="panel">
+<h2>EKSPERIMEN KIMIA TERLARANG</h2>
+<p style="text-align:center;">Campurkan 3 zat ke gelas kosong.</p>
+
+<div class="area" id="zona"></div>
+
+<div class="area">
+  <div>
+    <div id="hasil">
+      <div id="isiHasil"></div>
+    </div>
+    <div class="label">REAKSI AKHIR</div>
+  </div>
+</div>
+</div>
+
+<script>
+const dataZat=[
+ {w:"merah",n:"Hemoxin",k:"ZAT-02",c:"#b00000"},
+ {w:"biru",n:"Cryon",k:"ZAT-08",c:"#1f4fd8"},
+ {w:"kuning",n:"Sulphera",k:"ZAT-24",c:"#f1d400"},
+ {w:"hijau",n:"Virent",k:"ZAT-17",c:"#1e7f3a"},
+ {w:"abu",n:"Ashen",k:"ZAT-30",c:"#777"},
+ {w:"ungu",n:"Noctyra",k:"ZAT-15",c:"#5a2a82"},
+ {w:"oranye",n:"Pyrol",k:"ZAT-11",c:"#ff7b00"},
+ {w:"coklat",n:"Ferrox",k:"ZAT-42",c:"#5a3b1e"},
+ {w:"cyan",n:"Aquar",k:"ZAT-19",c:"#00bcd4"},
+ {w:"hitam",n:"Obscur",k:"ZAT-99",c:"#111"}
+];
+
+// ACAK POSISI
+dataZat.sort(()=>Math.random()-0.5);
+
+const zona=document.getElementById("zona");
+dataZat.forEach(z=>{
+  zona.innerHTML+=`
+  <div>
+    <div class="gelas" draggable="true" data-warna="${z.w}">
+      <div class="isi" style="background:${z.c}"></div>
+    </div>
+    <div class="label">${z.k}<br>${z.n}</div>
+  </div>`;
+});
+
+let urutan=[];
+const hasil=document.getElementById("hasil");
+const isiHasil=document.getElementById("isiHasil");
+
+document.querySelectorAll(".gelas").forEach(g=>{
+  g.addEventListener("dragstart",e=>{
+    e.dataTransfer.setData("warna",g.dataset.warna);
+  });
+});
+
+hasil.addEventListener("dragover",e=>e.preventDefault());
+
+hasil.addEventListener("drop",e=>{
+  e.preventDefault();
+  const w=e.dataTransfer.getData("warna");
+  if(urutan.length<3){
+    urutan.push(w);
+    isiHasil.style.height=(urutan.length*30)+"%";
+    isiHasil.style.background=hasilWarna();
+  }
+  if(urutan.length===3) cek();
+});
+
+function hasilWarna(){
+  if(urutan.join()==="merah,biru,kuning") return "#5a3b1e";
+  return "#3a3a3a";
+}
+
+function cek(){
+  if(urutan.join()!=="merah,biru,kuning"){
+    hasil.classList.add("salah");
+    setTimeout(reset,1600);
+  }
+}
+
+function reset(){
+  urutan=[];
+  isiHasil.style.height="0%";
+  isiHasil.style.background="transparent";
+  hasil.classList.remove("salah");
+}
+</script>
+
+</body>
+</html>
